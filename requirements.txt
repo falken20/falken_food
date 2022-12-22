@@ -1,0 +1,5 @@
+Flask
+python-dotenv
+rich>=11.2.0
+requests
+gunicorn  # Neccesary for app.yaml
