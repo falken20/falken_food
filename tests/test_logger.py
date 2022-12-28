@@ -25,104 +25,71 @@ class TestLogger(unittest.TestCase):
         logger.LEVEL_LOG = "['DEBUG']"
         trace = "Test Debug"
         logger.Log.debug(trace, style="error_style")
-        print(stdout.getvalue())
-        print(stderr.getvalue())
-
         #self.assertIn(trace, stdout.getvalue())
         self.assertEqual(True, True)
 
-
-def test_debug():
-    logger.LEVEL_LOG = "['DEBUG']"
-    trace = "Test Debug"
-
-    captured_output = redirect_stdout()
-    logger.Log.debug(trace)
-    redirect_reset()
-
-    assert trace in captured_output.getvalue()
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_debug(self, stdout):
+        logger.LEVEL_LOG = "['DEBUG']"
+        trace = "Test Debug"
+        logger.Log.debug(trace)
+        self.assertIn(trace, stdout.getvalue())
 
 
-def test_debug_no_trace():
-    logger.LEVEL_LOG = "[]"
-    trace = "Test Debug"
-
-    captured_output = redirect_stdout()
-    logger.Log.debug(trace)
-    redirect_reset()
-
-    assert trace not in captured_output.getvalue()
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_debug_no_trace(self, stdout):
+        logger.LEVEL_LOG = "[]"
+        trace = "Test Debug"
+        logger.Log.debug(trace)
+        self.assertNotIn(trace, stdout.getvalue())
 
 
-def test_info():
-    logger.LEVEL_LOG = "['INFO']"
-    trace = "Test Info"
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_info(self, stdout):
+        logger.LEVEL_LOG = "['INFO']"
+        trace = "Test Info"
+        logger.Log.info(trace)
+        self.assertIn(trace, stdout.getvalue())
 
-    captured_output = redirect_stdout()
-    logger.Log.info(trace)
-    redirect_reset()
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_info_no_trace(self, stdout):
+        logger.LEVEL_LOG = "[]"
+        trace = "Test Info"
+        logger.Log.info(trace)
+        self.assertNotIn(trace, stdout.getvalue())
 
-    assert trace in captured_output.getvalue()
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_warning(self, stdout):
+        logger.LEVEL_LOG = "['WARNING']"
+        trace = "Test Warning"
+        logger.Log.warning(trace)
+        self.assertIn(trace, stdout.getvalue())
 
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_warning_no_trace(self, stdout):
+        logger.LEVEL_LOG = "[]"
+        trace = "Test Warning"
+        logger.Log.warning(trace)
+        self.assertNotIn(trace, stdout.getvalue())
 
-def test_info_no_trace():
-    logger.LEVEL_LOG = "[]"
-    trace = "Test Info"
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_error(self, stdout):
+        logger.LEVEL_LOG = "['ERROR']"
+        trace = "Test Error"
 
-    captured_output = redirect_stdout()
-    logger.Log.info(trace)
-    redirect_reset()
+        try:
+            raise (Exception)
+        except Exception as err:
+            logger.Log.error(trace, err, sys)
+            self.assertIn(trace, stdout.getvalue())
 
-    assert trace not in captured_output.getvalue()
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_error_no_trace(self, stdout):
+        logger.LEVEL_LOG = "[]"
+        trace = "Test Error"
 
-
-def test_warning():
-    logger.LEVEL_LOG = "['WARNING']"
-    trace = "Test Warning"
-
-    captured_output = redirect_stdout()
-    logger.Log.warning(trace)
-    redirect_reset()
-
-    assert trace in captured_output.getvalue()
-
-
-def test_warning_no_trace():
-    logger.LEVEL_LOG = "[]"
-    trace = "Test Warning"
-
-    captured_output = redirect_stdout()
-    logger.Log.warning(trace)
-    redirect_reset()
-
-    assert trace not in captured_output.getvalue()
-
-
-def test_error():
-    logger.LEVEL_LOG = "['ERROR']"
-    trace = "Test Error"
-
-    try:
-        raise (Exception)
-
-    except Exception as err:
-        captured_output = redirect_stdout()
-        logger.Log.error(trace, err, sys)
-        redirect_reset()
-
-        assert trace in captured_output.getvalue()
-
-
-def test_error_no_trace():
-    logger.LEVEL_LOG = "[]"
-    trace = "Test Error"
-
-    try:
-        raise (Exception)
-
-    except Exception as err:
-        captured_output = redirect_stdout()
-        logger.Log.error(trace, err, sys)
-        redirect_reset()
-
-        assert trace not in captured_output.getvalue()
+        try:
+            raise (Exception)
+        except Exception as err:
+            logger.Log.error(trace, err, sys)
+            self.assertNotIn(trace, stdout.getvalue())
